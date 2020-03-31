@@ -33,20 +33,43 @@ void MainWidget::serial_start_init()
 
     QSqlQuery query;
     //创建表
-    query.exec("CREATE TABLE seria_parameter("
-               "name VARCHAR(20) NOT NULL,"
-               "data INTEGER NOT NULL)");
-    //导入数据
-    query.exec("INSERT INTO serial_parameter (name,data)"
-               "VALUES ('port','3')");
-    query.exec("INSERT INTO serial_parameter (name,data)"
-               "VALUES ('baudrate','9600')");
-    query.exec("INSERT INTO serial_parameter (name,data)"
-               "VALUES ('StopBit','1')");
-    query.exec("INSERT INTO serial_parameter (name,data)"
-               "VALUES ('DataBit','8')");
-    query.exec("INSERT INTO serial_parameter (name,data)"
-               "VALUES ('check','0')");
+    QString creat_table_SerialParameter="CREATE TABLE seria_parameter2 \
+                                        (\
+                                         name VARCHAR(20) NOT NULL,\
+                                         data INTEGER NOT NULL\
+                                         );";
+    query.prepare(creat_table_SerialParameter);
+    if(!query.exec()){
+                qDebug()<<"query error :"<<query.lastError();
+            }
+            else{
+                qDebug()<<"creat table success!";
+            }
+
+    QString insert_sql = "insert into seria_parameter2 values(?,?)";    //插入数据
+    query.prepare(insert_sql);
+    QVariantList GroupNames;
+    GroupNames.append("port");
+    GroupNames.append("baudrate");
+    GroupNames.append("StopBit");
+    GroupNames.append("DataBit");
+    GroupNames.append("Check");
+    QVariantList GroupDatas;
+    GroupDatas.append(3);
+    GroupDatas.append(9600);
+    GroupDatas.append(1);
+    GroupDatas.append(8);
+    GroupDatas.append(0);
+    query.addBindValue(GroupNames);
+    query.addBindValue(GroupDatas);
+    if(!query.execBatch())
+    {
+        qDebug()<<query.lastError();
+    }
+    else
+    {
+        qDebug()<<"插入记录成功";
+    }
 
     query.exec("CREATE TABLE students ("
                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -57,7 +80,7 @@ void MainWidget::serial_start_init()
                    "VALUES ('小张', 85, '初2-1班')");
                   //向students表里的(name, score,class)标题下插入一项数据'小张', 85, '初2-1班'
 
-
+    datebase_serial_parameter.close();
 
 
 
